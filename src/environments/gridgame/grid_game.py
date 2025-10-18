@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
 
-from src.distances import manhattan_distance
+from src.util.distances import manhattan_distance
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

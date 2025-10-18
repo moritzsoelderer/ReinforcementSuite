@@ -1,10 +1,9 @@
-import time
 from datetime import datetime
 
 from sympy.printing.pytorch import torch
 
-from src.reward_based_rl import reinforce, perform_episode
-from src.single_player_pong import SinglePlayerPong, SinglePlayerPongState
+from src.optimization.reward_based_rl import reinforce, perform_episode
+from src.environments.singleplayerpong.single_player_pong import SinglePlayerPong, SinglePlayerPongState
 
 if __name__ == "__main__":
     init_state = SinglePlayerPongState(agent_pos=(60, 400), agent_height=100,
@@ -27,4 +26,4 @@ if __name__ == "__main__":
     torch.save({
         'policy_state_dict': policy.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-    }, datetime.now().strftime('%m%d%Y_%H%M%S') + '.pth')
+    }, 'SinglePlayerPong_' + datetime.now().strftime('%m%d%Y_%H%M%S') + '.pth')

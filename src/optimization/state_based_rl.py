@@ -3,32 +3,18 @@ import random
 import torch
 from torch import optim, nn
 
-from src.RLNet import RLNet
-from src.grid_game import GridGame, GridGameState
+from src.optimization.RLNet import RLNet
 
-AGENT = (1, 1)
-DIAMOND = (10, 7)
-OBSTACLES = [(3, 0), (3, 1), (3, 2), (3, 3), (2, 4), (12, 7), (12, 6), (12, 5)]
-ENEMIES = [(6, 1), (1, 8), (6, 6)]
 
-def q_learning():
-    init_state = GridGameState(AGENT, DIAMOND, ENEMIES, OBSTACLES)
-
-    game = GridGame(
-        600, 500, 10, 12,
-        init_state
-    )
-
-    learning_rate = 0.005
-    obs_dim = len(init_state.to_vector())
+def q_learning(game, init_state, num_episodes=1000, max_iterations=1000, learning_rate=0.01, discount_factor=0.95, verbose=1,
+               layers=None):
+    obs_dim = len(init_state.state.to_vector())
     n_actions = len(game.get_actions())
 
-    q_net = RLNet(obs_dim, hidden_dim=64, output_dim=n_actions)
+    q_net = RLNet(obs_dim, hidden_dim=layers, output_dim=n_actions)
     optimizer = optim.Adam(q_net.parameters(), lr=learning_rate)
     q_net.set_optimiizer(optimizer)
 
-    num_episodes = 1000
-    gamma = 0.95
     criterion = nn.MSELoss()
 
     for episode in range(num_episodes):
@@ -40,7 +26,7 @@ def q_learning():
         iteration = 1
         rewards = []
         while not done:
-            if iteration >= 1000:
+            if iteration >= max_iterations:
                 break
             iteration += 1
             if random.random() < epsilon:
@@ -55,7 +41,7 @@ def q_learning():
             rewards.append(reward)
 
             q_next = q_net(next_state).max().detach()
-            target = reward + gamma * q_next
+            target = reward + discount_factor * q_next
 
             # Compute prediction and loss
             pred = q_net(state)[action]
@@ -68,9 +54,5 @@ def q_learning():
 
             state = next_state
 
-        print(f"Episode {episode}, Total Reward: {sum(rewards)}")
-
-
-
-if __name__ == '__main__':
-    q_learning()
+        if verbose > 0:
+            print(f"Episode {episode}, Total Reward: {sum(rewards)}")

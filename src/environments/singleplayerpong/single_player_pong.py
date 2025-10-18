@@ -1,9 +1,5 @@
-import time
-
 import numpy as np
 import pygame
-
-from src import distances
 
 WHITE = (255, 255, 255)
 BLACK = (10, 10, 10)
